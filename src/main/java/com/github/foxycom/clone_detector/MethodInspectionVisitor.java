@@ -1,5 +1,6 @@
 package com.github.foxycom.clone_detector;
 
+import com.github.foxycom.clone_detector.classifier.CloneClassifier;
 import com.github.foxycom.clone_detector.parser.MethodParser;
 import com.github.foxycom.clone_detector.parser.MethodVector;
 import com.github.foxycom.clone_detector.parser.VectorSimilarity;
@@ -12,18 +13,12 @@ import java.util.Arrays;
 public class MethodInspectionVisitor extends JavaElementVisitor {
 
   private final CloneFix cloneFix = new CloneFix();
-  private final String QUICK_FIX_NAME = "Code clone";
   private final ProblemsHolder holder;
+  private final CloneClassifier classifier;
 
-  public MethodInspectionVisitor(ProblemsHolder holder) {
+  public MethodInspectionVisitor(ProblemsHolder holder, CloneClassifier classifier) {
     this.holder = holder;
-  }
-
-  @Override
-  public void visitMethod(PsiMethod method) {
-    /*if (method.getName().equals("main")) {
-      Notifier.notify("Method body", method.getText());
-    }*/
+    this.classifier = classifier;
   }
 
   @Override
@@ -41,9 +36,9 @@ public class MethodInspectionVisitor extends JavaElementVisitor {
         if (methodB.getBody() == null) continue;
 
         MethodVector mvB = parser.parse(aClass.getText(), methodB.getName());
-        double[] sim = vs.methodVectorSim(mvA, mvB);
-        double averageSim = Arrays.stream(sim).map(v -> v * 0.125).sum();
-        if (averageSim > 0.6) {
+        double[] simVector = vs.methodVectorSim(mvA, mvB);
+        double p = classifier.run(simVector);
+        if (p > 0.8) {
           holder.registerProblem(methodA.getBody(), getDesc(methodB), cloneFix);
           holder.registerProblem(methodB.getBody(), getDesc(methodA), cloneFix);
         }
