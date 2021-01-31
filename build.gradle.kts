@@ -42,6 +42,9 @@ repositories {
     jcenter()
 }
 dependencies {
+    implementation("org.eclipse.jdt:core:3.3.0-v_771")
+    implementation("org.antlr:antlr4:4.5")
+    implementation("org.apache.commons:commons-lang3:3.0")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
 }
 
@@ -91,7 +94,7 @@ tasks {
         untilBuild(pluginUntilBuild)
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription(
+        /*pluginDescription(
             closure {
                 File("./README.md").readText().lines().run {
                     val start = "<!-- Plugin description -->"
@@ -103,7 +106,7 @@ tasks {
                     subList(indexOf(start) + 1, indexOf(end))
                 }.joinToString("\n").run { markdownToHTML(this) }
             }
-        )
+        )*/
 
         // Get the latest available change notes from the changelog file
         changeNotes(
