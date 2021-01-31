@@ -16,6 +16,8 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
+
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 // Import variables from gradle.properties file
@@ -41,17 +43,31 @@ repositories {
     mavenCentral()
     jcenter()
 }
+
+
 dependencies {
     implementation("org.eclipse.jdt:core:3.3.0-v_771")
     implementation("org.antlr:antlr4:4.5")
     implementation("org.apache.commons:commons-lang3:3.0")
-    implementation("org.nd4j:nd4j-cuda-10.2-platform:1.0.0-beta7")
-    implementation("org.deeplearning4j:deeplearning4j-cuda-10.2:1.0.0-beta7")
+    //implementation("org.nd4j:nd4j-cuda-10.2-platform:1.0.0-beta7")
+    implementation("org.nd4j:nd4j-native-platform:1.0.0-beta7")
+    //implementation("org.deeplearning4j:deeplearning4j-cuda-10.2:1.0.0-beta7")
     implementation("org.deeplearning4j:deeplearning4j-core:1.0.0-beta7")
     implementation("org.slf4j:slf4j-simple:1.6.2")
+    implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.9")
 
+    implementation("com.squareup.okhttp3:okhttp:3.4.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2") {
+        exclude(group = "org.eclipse.jdt")
+    }
+    testImplementation("com.google.truth:truth:1.1.2") {
+        exclude(group = "org.eclipse.jdt")
+    }
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
 }
+
+
 
 // Configure gradle-intellij-plugin plugin.
 // Read more: https://github.com/JetBrains/gradle-intellij-plugin
@@ -77,6 +93,11 @@ detekt {
         xml.enabled = false
         txt.enabled = false
     }
+}
+
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
 
 tasks {

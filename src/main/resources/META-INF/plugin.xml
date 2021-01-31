@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
     <id>com.github.foxycom.intellijclonedetector</id>
     <name>intellij-clone-detector</name>
     <vendor>foxycom</vendor>
@@ -12,7 +12,6 @@
         <applicationService serviceImplementation="com.github.foxycom.intellijclonedetector.services.MyApplicationService"/>
         <projectService serviceImplementation="com.github.foxycom.intellijclonedetector.services.MyProjectService"/>
     </extensions>-->
-
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="CloneNotification" displayType="BALLOON" key="notification.group.name"/>
         <localInspection language="JAVA"

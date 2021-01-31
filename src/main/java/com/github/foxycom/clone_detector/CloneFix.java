@@ -7,8 +7,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiBinaryExpression;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiExpression;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiPrefixExpression;
 import com.intellij.psi.tree.IElementType;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class CloneFix implements LocalQuickFix {
 
+  private PsiMethod[] methods;
   /**
    * Returns a partially localized string for the quick fix intention. Used by the test code for
    * this plugin.
@@ -39,6 +42,7 @@ public class CloneFix implements LocalQuickFix {
    * @param descriptor A problem found by this inspection.
    */
   public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+
     try {
       PsiBinaryExpression binaryExpression = (PsiBinaryExpression) descriptor.getPsiElement();
       IElementType opSign = binaryExpression.getOperationTokenType();
@@ -67,4 +71,6 @@ public class CloneFix implements LocalQuickFix {
       throw new RuntimeException(e);
     }
   }
+
+
 }

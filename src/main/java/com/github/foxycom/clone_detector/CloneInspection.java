@@ -1,6 +1,5 @@
 package com.github.foxycom.clone_detector;
 
-import com.github.foxycom.clone_detector.classifier.CloneClassifier;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElementVisitor;
@@ -9,16 +8,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class CloneInspection extends LocalInspectionTool {
 
-  private final CloneClassifier classifier;
+  private final Backend backend;
 
   public CloneInspection() throws IOException {
-    this.classifier = new CloneClassifier("./src/resources/model.mdl");
+    backend = new Backend("http://localhost:8080/");
   }
 
   @Override
   public @NotNull PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder,
       boolean isOnTheFly) {
-    return new MethodInspectionVisitor(holder, classifier);
+    return new MethodInspectionVisitor(holder, backend);
   }
 
 }
