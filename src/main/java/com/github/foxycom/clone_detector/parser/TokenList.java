@@ -25,7 +25,7 @@ public class TokenList {
     for (i = 0; i < tl.size(); i++) {
       for (j = 0; j < tokenList.size(); j++) {
         if (tokenList.get(j).TokenName.equals(tl.getTokenVector(i).TokenName)) {
-          tokenList.get(j).TokenCount += tl.getTokenVector(i).TokenCount;
+          tokenList.get(j).tokenCount += tl.getTokenVector(i).tokenCount;
           break;
         }
       }
@@ -55,8 +55,8 @@ public class TokenList {
   // get frequency count
   public int getFreqCount() {
     int tmp = 0;
-    for (int i = 0; i < tokenList.size(); i++) {
-      tmp = tokenList.get(i).TokenCount;
+    for (TokenVector tokenVector : tokenList) {
+      tmp = tokenVector.tokenCount;
     }
     return tmp;
   }
@@ -80,7 +80,7 @@ public class TokenList {
 
   // increase TokenCount
   public void setValueByIndex(int index) {
-    tokenList.get(index).TokenCount++;
+    tokenList.get(index).tokenCount++;
   }
 
   // sort ArrayList by TokenName
@@ -94,7 +94,7 @@ public class TokenList {
 
   // sort ArrayList by TokenCount
   public void sortListByCount() {
-    tokenList.sort((arg0, arg1) -> arg1.TokenCount - arg0.TokenCount);
+    tokenList.sort((arg0, arg1) -> arg1.tokenCount - arg0.tokenCount);
   }
 
   // print

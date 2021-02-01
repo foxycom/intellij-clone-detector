@@ -11,7 +11,7 @@ public class CloneInspection extends LocalInspectionTool {
   private final Backend backend;
 
   public CloneInspection() throws IOException {
-    backend = new Backend("http://localhost:8080/");
+    backend = new Backend("http://192.168.2.109:8080/");
   }
 
   @Override

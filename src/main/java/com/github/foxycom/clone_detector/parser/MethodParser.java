@@ -1,7 +1,9 @@
 package com.github.foxycom.clone_detector.parser;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Stack;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -22,6 +24,7 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 
 public class MethodParser {
+
   MethodVector mv;
 
   TokenList methodReservedWordTokenList;
@@ -34,6 +37,17 @@ public class MethodParser {
   TokenList methodQualifiedNameTokenList;
   boolean methodEntered;
   Stack<MethodVector> methodVectorStack;
+  ASTParser astParser;
+
+  public MethodParser() {
+    astParser = ASTParser.newParser(AST.JLS_Latest);
+    astParser.setResolveBindings(true);
+    astParser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+    Hashtable<String, String> options = JavaCore.getOptions();
+    options.put(JavaCore.COMPILER_SOURCE, "1.8");
+    astParser.setCompilerOptions(options);
+  }
 
   public void clear() {
     methodEntered = false;
@@ -44,16 +58,14 @@ public class MethodParser {
   public MethodVector parse(String classDefinition, String methodName) {
     clear();
 
-    ASTParser astParser = ASTParser.newParser(AST.JLS3);
     astParser.setSource(classDefinition.toCharArray());
-    astParser.setResolveBindings(true);
     final CompilationUnit cu = (CompilationUnit) astParser.createAST(null);
 
     cu.accept(new ASTVisitor() {
       @Override
       public boolean visit(MethodDeclaration method) {
-        if (!method.getName().getIdentifier().equals(methodName)
-            || method.getBody() == null) {
+        String identifier = method.getName().getIdentifier();
+        if (!identifier.equals(methodName) || method.getBody() == null) {
           return false;
         }
 
@@ -248,6 +260,17 @@ public class MethodParser {
   }
 
   public void addTokenList(TokenList tokenList, String str) {
+    int index;
+    index = tokenList.getIndexByName(str);
+    if (index != -1) {
+      tokenList.setValueByIndex(index);
+    } else {
+      TokenVector tokenVector = new TokenVector(str);
+      tokenList.addTokenVector(tokenVector);
+    }
+  }
+
+  public void removeTokenList(TokenList tokenList, String str) {
     int index;
     index = tokenList.getIndexByName(str);
     if (index != -1) {

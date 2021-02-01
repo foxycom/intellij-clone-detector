@@ -36,10 +36,8 @@ public final class ConnectionPool {
         logger.info("ConnectionPool initialized");
     }
 
-    /** Closes all database connections in the queue. */
     public void closeDBConnections() {
         logger.info("Closing ConnectionPool connections...");
-        // Needed to avoid ConcurrentModificationException when iterating and removing
         List<Connection> closedConnections = new ArrayList<>();
         try {
             for (Connection connection : connections) {
@@ -56,24 +54,7 @@ public final class ConnectionPool {
         logger.info("Closed ConnectionPool connections successfully.");
     }
 
-    public void d() {
-        logger.info("Closing ConnectionPool connections...");
-        // Needed to avoid ConcurrentModificationException when iterating and removing
-        List<Connection> closedConnections = new ArrayList<>();
-        try {
-            for (Connection connection : connections) {
-                connection.close();
-                availableConnections.remove(connection);
-                closedConnections.add(connection);
-            }
-        } catch (SQLException e) {
-            logger.warning("SQL exception while closing connections.");
-            throw new StorageException();
-        } finally {
-            connections.removeAll(closedConnections);
-        }
-        logger.info("Closed ConnectionPool connections successfully.");
-    }
+
 
     /**
      * Returns an unused connection from the queue. Tries to refresh connections once they do not

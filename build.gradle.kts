@@ -46,24 +46,16 @@ repositories {
 
 
 dependencies {
-    implementation("org.eclipse.jdt:core:3.3.0-v_771")
+    implementation("org.eclipse.jdt:org.eclipse.jdt.core:3.24.0")
     implementation("org.antlr:antlr4:4.5")
     implementation("org.apache.commons:commons-lang3:3.0")
-    //implementation("org.nd4j:nd4j-cuda-10.2-platform:1.0.0-beta7")
-    implementation("org.nd4j:nd4j-native-platform:1.0.0-beta7")
-    //implementation("org.deeplearning4j:deeplearning4j-cuda-10.2:1.0.0-beta7")
-    implementation("org.deeplearning4j:deeplearning4j-core:1.0.0-beta7")
     implementation("org.slf4j:slf4j-simple:1.6.2")
     implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.9")
 
     implementation("com.squareup.okhttp3:okhttp:3.4.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2") {
-        exclude(group = "org.eclipse.jdt")
-    }
-    testImplementation("com.google.truth:truth:1.1.2") {
-        exclude(group = "org.eclipse.jdt")
-    }
+    testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
+    testImplementation("com.google.truth:truth:1.1.2")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
 }
 
