@@ -48,7 +48,7 @@ repositories {
 dependencies {
     implementation("org.eclipse.jdt:org.eclipse.jdt.core:3.24.0")
     implementation("org.antlr:antlr4:4.5")
-    implementation("org.apache.commons:commons-lang3:3.0")
+    implementation("org.apache.commons:commons-lang3:3.11")
     implementation("org.slf4j:slf4j-simple:1.6.2")
     implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.9")
