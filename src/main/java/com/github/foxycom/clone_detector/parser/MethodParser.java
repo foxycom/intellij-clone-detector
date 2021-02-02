@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -25,8 +26,6 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 
 public class MethodParser {
 
-  MethodVector mv;
-
   TokenList methodReservedWordTokenList;
   TokenList methodMarkerTokenList;
   TokenList methodOperatorTokenList;
@@ -43,7 +42,6 @@ public class MethodParser {
     astParser = ASTParser.newParser(AST.JLS_Latest);
     astParser.setResolveBindings(true);
     astParser.setKind(ASTParser.K_COMPILATION_UNIT);
-
     Hashtable<String, String> options = JavaCore.getOptions();
     options.put(JavaCore.COMPILER_SOURCE, "1.8");
     astParser.setCompilerOptions(options);
@@ -51,51 +49,34 @@ public class MethodParser {
 
   public void clear() {
     methodEntered = false;
-
     methodVectorStack = new Stack<>();
   }
 
-  public MethodVector parse(String classDefinition, String methodName) {
+  public MethodVector parse(String classBody) {
     clear();
+    astParser.setSource(classBody.toCharArray());
+    final CompilationUnit block = (CompilationUnit) astParser.createAST(null);
+    methodTypeTokenList = new TokenList();
+    methodLiteralTokenList = new TokenList();
+    methodVariableTokenList = new TokenList();
+    methodFunctionNameTokenList = new TokenList();
+    methodQualifiedNameTokenList = new TokenList();
 
-    astParser.setSource(classDefinition.toCharArray());
-    final CompilationUnit cu = (CompilationUnit) astParser.createAST(null);
+    var methodTokenParser = new MethodTokenParserTool();
+    methodReservedWordTokenList = methodTokenParser.getReservedWordTokenList(classBody);
+    methodOperatorTokenList = methodTokenParser.getOperatorTokenList(classBody);
+    methodMarkerTokenList = methodTokenParser.getMarkerTokenList(classBody);
 
-    cu.accept(new ASTVisitor() {
+    var methodVector = new MethodVector(0, 0,
+        methodReservedWordTokenList, methodTypeTokenList, methodLiteralTokenList,
+        methodVariableTokenList, methodFunctionNameTokenList,
+        methodQualifiedNameTokenList, methodOperatorTokenList, methodMarkerTokenList);
+    methodVectorStack.push(methodVector);
+
+    block.accept(new ASTVisitor() {
       @Override
-      public boolean visit(MethodDeclaration method) {
-        String identifier = method.getName().getIdentifier();
-        if (!identifier.equals(methodName) || method.getBody() == null) {
-          return false;
-        }
-
+      public boolean visit(MethodDeclaration node) {
         methodEntered = true;
-
-        int startLineNum = cu.getLineNumber(method.getBody().getStartPosition());
-        int endLineNum = cu.getLineNumber(
-            method.getBody().getStartPosition() + method.getBody().getLength());
-        String body = method.getBody().toString();
-        MethodTokenParserTool methodTokenParser = new MethodTokenParserTool();
-
-        methodTypeTokenList = new TokenList();
-        methodLiteralTokenList = new TokenList();
-        methodVariableTokenList = new TokenList();
-        methodFunctionNameTokenList = new TokenList();
-        methodQualifiedNameTokenList = new TokenList();
-
-        methodReservedWordTokenList = methodTokenParser.getReservedWordTokenList(body);
-        methodOperatorTokenList = methodTokenParser.getOperatorTokenList(body);
-        methodMarkerTokenList = methodTokenParser.getMarkerTokenList(body);
-
-        MethodVector methodVector = new MethodVector("SomeClass", startLineNum, endLineNum,
-            methodReservedWordTokenList, methodTypeTokenList, methodLiteralTokenList,
-            methodVariableTokenList, methodFunctionNameTokenList,
-            methodQualifiedNameTokenList, methodOperatorTokenList, methodMarkerTokenList);
-        methodVectorStack.push(methodVector);
-        mv = methodVector;
-
-        method.getBody().accept(this);
-
         return false;
       }
 
@@ -104,33 +85,28 @@ public class MethodParser {
       //////////////////////////////////////////////////////
       @Override
       public boolean visit(BooleanLiteral node) {
-        if (methodEntered) {
-          addTokenList(methodLiteralTokenList, node.toString());
-        }
+        addTokenList(methodLiteralTokenList, node.toString());
         return false;
       }
 
       @Override
       public boolean visit(CharacterLiteral node) {
-        if (methodEntered) {
+        if (methodEntered)
           addTokenList(methodLiteralTokenList, node.toString());
-        }
         return false;
       }
 
       @Override
       public boolean visit(NullLiteral node) {
-        if (methodEntered) {
+        if (methodEntered)
           addTokenList(methodLiteralTokenList, node.toString());
-        }
         return false;
       }
 
       @Override
       public boolean visit(NumberLiteral node) {
-        if (methodEntered) {
+        if (methodEntered)
           addTokenList(methodLiteralTokenList, node.toString());
-        }
         return false;
       }
 
@@ -144,9 +120,8 @@ public class MethodParser {
 
       @Override
       public boolean visit(TypeLiteral node) {
-        if (methodEntered) {
+        if (methodEntered)
           addTokenList(methodLiteralTokenList, node.toString());
-        }
         return false;
       }
 
@@ -155,9 +130,8 @@ public class MethodParser {
       //////////////////////////////////////////////////////
       @Override
       public boolean visit(SimpleName node) {
-        if (methodEntered) {
+        if (methodEntered)
           addTokenList(methodVariableTokenList, node.toString());
-        }
         return false;
       }
 
@@ -166,16 +140,16 @@ public class MethodParser {
       //////////////////////////////////////////////////////
       @Override
       public boolean visit(MethodInvocation node) {
-        if (methodEntered) {
-          addTokenList(methodFunctionNameTokenList, node.getName().toString());
-          if (node.getExpression() != null) {
-            node.getExpression().accept(this);
-          }
-          if (node.arguments().size() > 0) {
-            List<ASTNode> list = node.arguments();
-            for (ASTNode nodeInList : list) {
-              nodeInList.accept(this);
-            }
+        if (!methodEntered)
+          return false;
+        addTokenList(methodFunctionNameTokenList, node.getName().toString());
+        if (node.getExpression() != null) {
+          node.getExpression().accept(this);
+        }
+        if (node.arguments().size() > 0) {
+          List<ASTNode> list = node.arguments();
+          for (ASTNode nodeInList : list) {
+            nodeInList.accept(this);
           }
         }
         return false;
@@ -219,45 +193,20 @@ public class MethodParser {
         return false;
       }
 
-      @Override
-      public void endVisit(MethodDeclaration node) {
-
-        MethodVector methodVector;
-        if (!methodVectorStack.empty()) {
-          methodVector = methodVectorStack.pop();
-          if (methodVector.endLineNumber - methodVector.startLineNumber + 1 >= 6) {
-            methodVector.methodReservedWordTokenList.sortByName();
-            methodVector.methodTypeTokenList.sortByName();
-            methodVector.methodLiteralTokenList.sortByName();
-            methodVector.methodVariableTokenList.sortByName();
-            methodVector.methodFunctionNameTokenList.sortByName();
-            methodVector.methodQualifiedNameTokenList.sortByName();
-            methodVector.methodOperatorTokenList.sortByName();
-            methodVector.methodMarkerTokenList.sortByName();
-          }
-        }
-
-        if (!methodVectorStack.empty()) {
-          methodVector = methodVectorStack.peek();
-          methodVector.methodTypeTokenList.addTokenList(methodTypeTokenList);
-          methodTypeTokenList = methodVector.methodTypeTokenList;
-          methodVector.methodLiteralTokenList.addTokenList(methodLiteralTokenList);
-          methodLiteralTokenList = methodVector.methodLiteralTokenList;
-          methodVector.methodVariableTokenList.addTokenList(methodVariableTokenList);
-          methodVariableTokenList = methodVector.methodVariableTokenList;
-          methodVector.methodFunctionNameTokenList.addTokenList(methodFunctionNameTokenList);
-          methodFunctionNameTokenList = methodVector.methodFunctionNameTokenList;
-          methodVector.methodQualifiedNameTokenList.addTokenList(methodQualifiedNameTokenList);
-          methodQualifiedNameTokenList = methodVector.methodQualifiedNameTokenList;
-        } else {
-          methodEntered = false;
-        }
-      }
-
     });
 
-    return mv;
+    methodVector.methodReservedWordTokenList.sortByName();
+    methodVector.methodTypeTokenList.sortByName();
+    methodVector.methodLiteralTokenList.sortByName();
+    methodVector.methodVariableTokenList.sortByName();
+    methodVector.methodFunctionNameTokenList.sortByName();
+    methodVector.methodQualifiedNameTokenList.sortByName();
+    methodVector.methodOperatorTokenList.sortByName();
+    methodVector.methodMarkerTokenList.sortByName();
+
+    return methodVector;
   }
+
 
   public void addTokenList(TokenList tokenList, String str) {
     int index;

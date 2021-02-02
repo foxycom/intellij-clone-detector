@@ -20,11 +20,6 @@ class MethodParserTest {
   @Test
   void parse() throws FileNotFoundException {
 
-    File testClass = new File("src/test/resources/ConnectionPool.java");
-    BufferedReader in = new BufferedReader(new FileReader(testClass));
-    String clazz = in.lines().collect(Collectors.joining("\n"));
-    MethodVector res = methodParser
-        .parse(clazz, "closeDBConnections");
-    System.out.println();
+
   }
 }

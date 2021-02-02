@@ -22,7 +22,7 @@ public final class ConnectionPool {
     /** Number of constantly open connections. */
     private int nbConnections;
 
-    public ConnectionPool() {
+    public ConnectionPool(Integer in) {
         Connection newConnection;
         nbConnections = 5;
         availableConnections = new LinkedList<>();

@@ -7,6 +7,7 @@
     <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
+    <depends>com.intellij.modules.java</depends>
 
    <!-- <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.github.foxycom.intellijclonedetector.services.MyApplicationService"/>
@@ -15,13 +16,18 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="CloneNotification" displayType="BALLOON" key="notification.group.name"/>
         <localInspection language="JAVA"
-          displayName="Clone detection: duplicated code"
+          displayName="Possibly duplicated code"
           groupPath="Java"
           groupBundle="messages.InspectionsBundle"
           groupKey="group.names.probable.bugs"
           enabledByDefault="true"
           level="WARNING"
-          implementationClass="com.github.foxycom.clone_detector.CloneInspection"/>
+          implementationClass="com.github.foxycom.clone_detector.LocalCloneInspection"/>
+
+        <globalInspection displayName="Clone detected"
+          enabledByDefault="true" groupName="com.github.foxycom"
+          implementationClass="com.github.foxycom.clone_detector.GlobalCloneInspection"
+          language="JAVA" level="WARNING" shortName="Clone"/>
     </extensions>
 
     <!--<applicationListeners>

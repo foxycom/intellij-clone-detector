@@ -1,11 +1,13 @@
 package com.github.foxycom.clone_detector.util;
 
+import com.intellij.psi.PsiMethod;
+
 public class MethodComparisonContainer {
   private final double[] simVector;
-  private final int methodA;
-  private final int methodB;
+  private final PsiMethod methodA;
+  private final PsiMethod methodB;
 
-  public MethodComparisonContainer(double[] simVector, int methodA, int methodB) {
+  public MethodComparisonContainer(double[] simVector, PsiMethod methodA, PsiMethod methodB) {
     this.simVector = simVector;
     this.methodA = methodA;
     this.methodB = methodB;
@@ -15,11 +17,11 @@ public class MethodComparisonContainer {
     return simVector;
   }
 
-  public int getMethodA() {
+  public PsiMethod getMethodA() {
     return methodA;
   }
 
-  public int getMethodB() {
+  public PsiMethod getMethodB() {
     return methodB;
   }
 }
