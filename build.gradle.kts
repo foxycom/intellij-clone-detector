@@ -53,7 +53,7 @@ dependencies {
     implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.9")
 
-    implementation("com.squareup.okhttp3:okhttp:3.4.2")
+    implementation("com.squareup.okhttp3:okhttp:4.9.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
     testImplementation("com.google.truth:truth:1.1.2")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
