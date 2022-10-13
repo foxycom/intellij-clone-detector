@@ -51,7 +51,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.0")
     implementation("org.slf4j:slf4j-simple:1.6.2")
     implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.9")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.4.1")
 
     implementation("com.squareup.okhttp3:okhttp:3.4.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
